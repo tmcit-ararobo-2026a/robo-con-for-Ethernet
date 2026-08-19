@@ -51,10 +51,10 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, ST_LED_4_Pin|ST_LED_3_Pin|ST_LED_2_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOC, LED4_Pin|LED3_Pin|LED2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOF, ST_LED_1_Pin|ST_LED_0_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOF, LED1_Pin|LED0_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
@@ -63,26 +63,26 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, ST_LED_W5500_Pin|ST_LED_USB_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_W5500_Pin|LED_USB_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : ST_LED_4_Pin ST_LED_3_Pin ST_LED_2_Pin */
-  GPIO_InitStruct.Pin = ST_LED_4_Pin|ST_LED_3_Pin|ST_LED_2_Pin;
+  /*Configure GPIO pins : LED4_Pin LED3_Pin LED2_Pin */
+  GPIO_InitStruct.Pin = LED4_Pin|LED3_Pin|LED2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ST_LED_1_Pin ST_LED_0_Pin */
-  GPIO_InitStruct.Pin = ST_LED_1_Pin|ST_LED_0_Pin;
+  /*Configure GPIO pins : LED1_Pin LED0_Pin */
+  GPIO_InitStruct.Pin = LED1_Pin|LED0_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOF, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Left_Push_Stick_Pin Right_Push_Stick_Pin Right_Lever_Switch_2_Pin Right_Lever_Switch_1_Pin
-                           Right_Lever_Switch_0_Pin Right_Lever_Switch_4_Pin */
-  GPIO_InitStruct.Pin = Left_Push_Stick_Pin|Right_Push_Stick_Pin|Right_Lever_Switch_2_Pin|Right_Lever_Switch_1_Pin
-                          |Right_Lever_Switch_0_Pin|Right_Lever_Switch_4_Pin;
+  /*Configure GPIO pins : STICK_PUSH_L_Pin STICK_PUSH_R_Pin LEVER_R2_Pin LEVER_R1_Pin
+                           LEVER_R0_Pin LEVER_R4_Pin */
+  GPIO_InitStruct.Pin = STICK_PUSH_L_Pin|STICK_PUSH_R_Pin|LEVER_R2_Pin|LEVER_R1_Pin
+                          |LEVER_R0_Pin|LEVER_R4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -94,11 +94,11 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(SPI1_CS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : W5500_nINT_Pin */
-  GPIO_InitStruct.Pin = W5500_nINT_Pin;
+  /*Configure GPIO pin : W5500_IT_Pin */
+  GPIO_InitStruct.Pin = W5500_IT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(W5500_nINT_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(W5500_IT_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : W5500_RST_Pin */
   GPIO_InitStruct.Pin = W5500_RST_Pin;
@@ -107,41 +107,41 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(W5500_RST_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Right_Button_5_Pin Right_Button_6_Pin Right_Button_7_Pin */
-  GPIO_InitStruct.Pin = Right_Button_5_Pin|Right_Button_6_Pin|Right_Button_7_Pin;
+  /*Configure GPIO pins : BUTTON_R5_Pin BUTTON_R6_Pin BUTTON_R7_Pin */
+  GPIO_InitStruct.Pin = BUTTON_R5_Pin|BUTTON_R6_Pin|BUTTON_R7_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Right_Lever_Switch_3_Pin */
-  GPIO_InitStruct.Pin = Right_Lever_Switch_3_Pin;
+  /*Configure GPIO pin : LEVER_R3_Pin */
+  GPIO_InitStruct.Pin = LEVER_R3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(Right_Lever_Switch_3_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(LEVER_R3_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ST_LED_W5500_Pin ST_LED_USB_Pin */
-  GPIO_InitStruct.Pin = ST_LED_W5500_Pin|ST_LED_USB_Pin;
+  /*Configure GPIO pins : LED_W5500_Pin LED_USB_Pin */
+  GPIO_InitStruct.Pin = LED_W5500_Pin|LED_USB_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : Left_Button_1_Pin */
-  GPIO_InitStruct.Pin = Left_Button_1_Pin;
+  /*Configure GPIO pin : BUTTON_L1_Pin */
+  GPIO_InitStruct.Pin = BUTTON_L1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-  HAL_GPIO_Init(Left_Button_1_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(BUTTON_L1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Left_Button_2_Pin Left_Button_3_Pin Left_Button_4_Pin */
-  GPIO_InitStruct.Pin = Left_Button_2_Pin|Left_Button_3_Pin|Left_Button_4_Pin;
+  /*Configure GPIO pins : BUTTON_L2_Pin BUTTON_L3_Pin BUTTON_L4_Pin */
+  GPIO_InitStruct.Pin = BUTTON_L2_Pin|BUTTON_L3_Pin|BUTTON_L4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Left_Lever_Switch_3_Pin Left_Lever_Switch_4_Pin Left_Lever_Switch_0_Pin Left_Lever_Switch_2_Pin
-                           Left_Lever_Switch_1_Pin */
-  GPIO_InitStruct.Pin = Left_Lever_Switch_3_Pin|Left_Lever_Switch_4_Pin|Left_Lever_Switch_0_Pin|Left_Lever_Switch_2_Pin
-                          |Left_Lever_Switch_1_Pin;
+  /*Configure GPIO pins : LEVER_L3_Pin LEVER_L4_Pin LEVER_L0_Pin LEVER_L2_Pin
+                           LEVER_L1_Pin */
+  GPIO_InitStruct.Pin = LEVER_L3_Pin|LEVER_L4_Pin|LEVER_L0_Pin|LEVER_L2_Pin
+                          |LEVER_L1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
