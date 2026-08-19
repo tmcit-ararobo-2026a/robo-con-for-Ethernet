@@ -80,8 +80,8 @@ void Error_Handler(void);
 #define W5500_nINT_Pin GPIO_PIN_0
 #define W5500_nINT_GPIO_Port GPIOB
 #define W5500_nINT_EXTI_IRQn EXTI0_IRQn
-#define W5500_nRST_Pin GPIO_PIN_1
-#define W5500_nRST_GPIO_Port GPIOB
+#define W5500_RST_Pin GPIO_PIN_1
+#define W5500_RST_GPIO_Port GPIOB
 #define Right_X_Stick_Pin GPIO_PIN_11
 #define Right_X_Stick_GPIO_Port GPIOB
 #define Right_Y_Stick_Pin GPIO_PIN_12

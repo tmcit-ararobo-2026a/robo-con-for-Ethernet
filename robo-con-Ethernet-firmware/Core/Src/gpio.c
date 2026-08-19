@@ -60,7 +60,7 @@ void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(W5500_nRST_GPIO_Port, W5500_nRST_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(W5500_RST_GPIO_Port, W5500_RST_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, ST_LED_W5500_Pin|ST_LED_USB_Pin, GPIO_PIN_RESET);
@@ -100,12 +100,12 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(W5500_nINT_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : W5500_nRST_Pin */
-  GPIO_InitStruct.Pin = W5500_nRST_Pin;
+  /*Configure GPIO pin : W5500_RST_Pin */
+  GPIO_InitStruct.Pin = W5500_RST_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(W5500_nRST_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(W5500_RST_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : Right_Button_5_Pin Right_Button_6_Pin Right_Button_7_Pin */
   GPIO_InitStruct.Pin = Right_Button_5_Pin|Right_Button_6_Pin|Right_Button_7_Pin;
