@@ -1,0 +1,7 @@
+#pragma once
+
+#define STICK_X_R_CENTER 126
+#define STICK_Y_R_CENTER 126
+#define STICK_X_L_CENTER 126
+#define STICK_Y_L_CENTER 126
+#define STICK_CENTER_MARGIN 10
