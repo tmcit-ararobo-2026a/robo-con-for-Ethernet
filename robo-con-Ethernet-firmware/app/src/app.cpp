@@ -66,6 +66,8 @@ void update_buttons_value()
     teleop.buttons.triangle = HAL_GPIO_ReadPin(BUTTON_R7_GPIO_Port, BUTTON_R7_Pin);
     teleop.buttons.stick_push_left = HAL_GPIO_ReadPin(STICK_PUSH_L_GPIO_Port, STICK_PUSH_L_Pin);
     teleop.buttons.stick_push_right = HAL_GPIO_ReadPin(STICK_PUSH_R_GPIO_Port, STICK_PUSH_R_Pin);
+}
+
 }  // namespace
 
 void setup()
