@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <cstdio>
 
 #include "adc.h"
 #include "app/robot_config.hpp"
@@ -37,21 +38,17 @@ void update_heartbeat_led()
 int8_t normalize_adc_value(uint16_t target_adc_buffer, uint16_t zero_reference)
 {
     int normalized_value = 0;
-    if (target_adc_buffer < zero_reference) {
-        normalized_value = -target_adc_buffer;
-    } else {
-        normalized_value = target_adc_buffer;
-    }
-    normalized_value = std::clamp(normalized_value, INT8_MIN, INT8_MAX);
+    normalized_value     = target_adc_buffer - zero_reference;
+    normalized_value     = std::clamp(normalized_value, INT8_MIN, INT8_MAX);
     return (int8_t)normalized_value;
 }
 
 void update_stick_values()
 {
-    teleop.analog.stick_right[0] = normalize_adc_value(adc_raw_value[0], STICK_X_R_CENTER);
-    teleop.analog.stick_right[1] = normalize_adc_value(adc_raw_value[1], STICK_Y_R_CENTER);
-    teleop.analog.stick_left[0]  = normalize_adc_value(adc_raw_value[2], STICK_X_L_CENTER);
-    teleop.analog.stick_left[1]  = normalize_adc_value(adc_raw_value[3], STICK_Y_L_CENTER);
+    teleop.analog.stick_right[0] = -normalize_adc_value(adc_raw_value[3], STICK_X_R_CENTER);
+    teleop.analog.stick_right[1] = normalize_adc_value(adc_raw_value[2], STICK_Y_R_CENTER);
+    teleop.analog.stick_left[0]  = -normalize_adc_value(adc_raw_value[0], STICK_X_L_CENTER);
+    teleop.analog.stick_left[1]  = normalize_adc_value(adc_raw_value[1], STICK_Y_L_CENTER);
 }
 
 void update_buttons_value()
@@ -70,18 +67,20 @@ void update_buttons_value()
 void update_levers_value()
 {
     /* left lever*/
+    teleop.buttons.lever_left = robot_config::LeverPosition::FRONT;
     if (HAL_GPIO_ReadPin(LEVER_L0_GPIO_Port, LEVER_L0_Pin) == GPIO_PIN_SET) {
         teleop.buttons.lever_left = robot_config::LeverPosition::PUSH;
-    } else if (HAL_GPIO_ReadPin(LEVER_L1_GPIO_Port, LEVER_L1_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_left = robot_config::LeverPosition::LEFT;
-    } else if (HAL_GPIO_ReadPin(LEVER_L2_GPIO_Port, LEVER_L2_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_left = robot_config::LeverPosition::LEFT_DEEP;
-    } else if (HAL_GPIO_ReadPin(LEVER_L3_GPIO_Port, LEVER_L3_Pin == GPIO_PIN_SET)) {
-        teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT;
-    } else if (HAL_GPIO_ReadPin(LEVER_L4_GPIO_Port, LEVER_L4_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT_DEEP;
     } else {
-        teleop.buttons.lever_left = robot_config::LeverPosition::FRONT;
+        if (HAL_GPIO_ReadPin(LEVER_L2_GPIO_Port, LEVER_L2_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_left = robot_config::LeverPosition::LEFT_DEEP;
+        } else if (HAL_GPIO_ReadPin(LEVER_L1_GPIO_Port, LEVER_L1_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_left = robot_config::LeverPosition::LEFT;
+        }
+        if (HAL_GPIO_ReadPin(LEVER_L4_GPIO_Port, LEVER_L4_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT_DEEP;
+        } else if (HAL_GPIO_ReadPin(LEVER_L3_GPIO_Port, LEVER_L3_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT;
+        }
     }
     /* right lever*/
     if (HAL_GPIO_ReadPin(LEVER_R0_GPIO_Port, LEVER_R0_Pin) == GPIO_PIN_SET) {
@@ -112,8 +111,31 @@ void loop()
 {
     update_stick_values();
     update_buttons_value();
+    update_levers_value();
     update_heartbeat_led();
-    
+    printf(
+        "teleop: header=%u stick_r=(%d,%d) stick_l=(%d,%d) "
+        "lever_r=%u lever_l=%u "
+        "push_r=%u push_l=%u buttons=(up:%u down:%u right:%u left:%u "
+        "circle:%u cross:%u triangle:%u) checksum=%u\r\n",
+        static_cast<unsigned>(teleop.header),
+        teleop.analog.stick_right[0],
+        teleop.analog.stick_right[1],
+        teleop.analog.stick_left[0],
+        teleop.analog.stick_left[1],
+        static_cast<unsigned>(teleop.buttons.lever_right),
+        static_cast<unsigned>(teleop.buttons.lever_left),
+        static_cast<unsigned>(teleop.buttons.stick_push_right),
+        static_cast<unsigned>(teleop.buttons.stick_push_left),
+        static_cast<unsigned>(teleop.buttons.up),
+        static_cast<unsigned>(teleop.buttons.down),
+        static_cast<unsigned>(teleop.buttons.right),
+        static_cast<unsigned>(teleop.buttons.left),
+        static_cast<unsigned>(teleop.buttons.circle),
+        static_cast<unsigned>(teleop.buttons.cross),
+        static_cast<unsigned>(teleop.buttons.triangle),
+        static_cast<unsigned>(teleop.data_checksum)
+    );
 }
 extern "C" {
 }
