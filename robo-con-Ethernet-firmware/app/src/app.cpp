@@ -49,9 +49,23 @@ int8_t normalize_adc_value(uint16_t target_adc_buffer, uint16_t zero_reference)
 
 void update_stick_values()
 {
-    
+    teleop.analog.stick_right[0] = normalize_adc_value(adc_raw_value[0], STICK_X_R_CENTER);
+    teleop.analog.stick_right[1] = normalize_adc_value(adc_raw_value[1], STICK_Y_R_CENTER);
+    teleop.analog.stick_left[0]  = normalize_adc_value(adc_raw_value[2], STICK_X_L_CENTER);
+    teleop.analog.stick_left[1]  = normalize_adc_value(adc_raw_value[3], STICK_Y_L_CENTER);
 }
 
+void update_buttons_value()
+{
+    teleop.buttons.up = HAL_GPIO_ReadPin(BUTTON_L1_GPIO_Port, BUTTON_L1_Pin);
+    teleop.buttons.down = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
+    teleop.buttons.right = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
+    teleop.buttons.left = HAL_GPIO_ReadPin(BUTTON_L4_GPIO_Port, BUTTON_L4_Pin);
+    teleop.buttons.circle = HAL_GPIO_ReadPin(BUTTON_R5_GPIO_Port, BUTTON_R5_Pin);
+    teleop.buttons.cross = HAL_GPIO_ReadPin(BUTTON_R6_GPIO_Port, BUTTON_R6_Pin);
+    teleop.buttons.triangle = HAL_GPIO_ReadPin(BUTTON_R7_GPIO_Port, BUTTON_R7_Pin);
+    teleop.buttons.stick_push_left = HAL_GPIO_ReadPin(STICK_PUSH_L_GPIO_Port, STICK_PUSH_L_Pin);
+    teleop.buttons.stick_push_right = HAL_GPIO_ReadPin(STICK_PUSH_R_GPIO_Port, STICK_PUSH_R_Pin);
 }  // namespace
 
 void setup()
@@ -63,6 +77,7 @@ void setup()
 
 void loop()
 {
+    update_stick_values();
     update_heartbeat_led();
 }
 extern "C" {
