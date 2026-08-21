@@ -1,7 +1,7 @@
 #include "app/app.hpp"
 
-#include <cstdint>
 #include <algorithm>
+#include <cstdint>
 
 #include "adc.h"
 #include "app/robot_config.hpp"
@@ -30,21 +30,20 @@ void update_heartbeat_led()
 
 /**
  * @brief uint16のADC後の値をint8へ正規化
- * 
+ *
  * @param target_adc_buffer 処理するADC値
  * @param zero_reference ADCのどの値をゼロとするか
  */
 int8_t normalize_adc_value(uint16_t target_adc_buffer, uint16_t zero_reference)
 {
     int normalized_value = 0;
-    if (target_adc_buffer < zero_reference)
-    {
+    if (target_adc_buffer < zero_reference) {
         normalized_value = -target_adc_buffer;
     } else {
         normalized_value = target_adc_buffer;
     }
     normalized_value = std::clamp(normalized_value, INT8_MIN, INT8_MAX);
-    return (int8_t)normalized_value;   
+    return (int8_t)normalized_value;
 }
 
 void update_stick_values()
@@ -57,15 +56,47 @@ void update_stick_values()
 
 void update_buttons_value()
 {
-    teleop.buttons.up = HAL_GPIO_ReadPin(BUTTON_L1_GPIO_Port, BUTTON_L1_Pin);
-    teleop.buttons.down = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
-    teleop.buttons.right = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
-    teleop.buttons.left = HAL_GPIO_ReadPin(BUTTON_L4_GPIO_Port, BUTTON_L4_Pin);
-    teleop.buttons.circle = HAL_GPIO_ReadPin(BUTTON_R5_GPIO_Port, BUTTON_R5_Pin);
-    teleop.buttons.cross = HAL_GPIO_ReadPin(BUTTON_R6_GPIO_Port, BUTTON_R6_Pin);
-    teleop.buttons.triangle = HAL_GPIO_ReadPin(BUTTON_R7_GPIO_Port, BUTTON_R7_Pin);
-    teleop.buttons.stick_push_left = HAL_GPIO_ReadPin(STICK_PUSH_L_GPIO_Port, STICK_PUSH_L_Pin);
+    teleop.buttons.up               = HAL_GPIO_ReadPin(BUTTON_L1_GPIO_Port, BUTTON_L1_Pin);
+    teleop.buttons.down             = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
+    teleop.buttons.right            = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
+    teleop.buttons.left             = HAL_GPIO_ReadPin(BUTTON_L4_GPIO_Port, BUTTON_L4_Pin);
+    teleop.buttons.circle           = HAL_GPIO_ReadPin(BUTTON_R5_GPIO_Port, BUTTON_R5_Pin);
+    teleop.buttons.cross            = HAL_GPIO_ReadPin(BUTTON_R6_GPIO_Port, BUTTON_R6_Pin);
+    teleop.buttons.triangle         = HAL_GPIO_ReadPin(BUTTON_R7_GPIO_Port, BUTTON_R7_Pin);
+    teleop.buttons.stick_push_left  = HAL_GPIO_ReadPin(STICK_PUSH_L_GPIO_Port, STICK_PUSH_L_Pin);
     teleop.buttons.stick_push_right = HAL_GPIO_ReadPin(STICK_PUSH_R_GPIO_Port, STICK_PUSH_R_Pin);
+}
+
+void update_levers_value()
+{
+    /* left lever*/
+    if (HAL_GPIO_ReadPin(LEVER_L0_GPIO_Port, LEVER_L0_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_left = robot_config::LeverPosition::PUSH;
+    } else if (HAL_GPIO_ReadPin(LEVER_L1_GPIO_Port, LEVER_L1_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_left = robot_config::LeverPosition::LEFT;
+    } else if (HAL_GPIO_ReadPin(LEVER_L2_GPIO_Port, LEVER_L2_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_left = robot_config::LeverPosition::LEFT_DEEP;
+    } else if (HAL_GPIO_ReadPin(LEVER_L3_GPIO_Port, LEVER_L3_Pin == GPIO_PIN_SET)) {
+        teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT;
+    } else if (HAL_GPIO_ReadPin(LEVER_L4_GPIO_Port, LEVER_L4_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT_DEEP;
+    } else {
+        teleop.buttons.lever_left = robot_config::LeverPosition::FRONT;
+    }
+    /* right lever*/
+    if (HAL_GPIO_ReadPin(LEVER_R0_GPIO_Port, LEVER_R0_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_right = robot_config::LeverPosition::PUSH;
+    } else if (HAL_GPIO_ReadPin(LEVER_R1_GPIO_Port, LEVER_R1_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_right = robot_config::LeverPosition::LEFT;
+    } else if (HAL_GPIO_ReadPin(LEVER_R2_GPIO_Port, LEVER_R2_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_right = robot_config::LeverPosition::LEFT_DEEP;
+    } else if (HAL_GPIO_ReadPin(LEVER_R3_GPIO_Port, LEVER_R3_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT;
+    } else if (HAL_GPIO_ReadPin(LEVER_R4_GPIO_Port, LEVER_R4_Pin) == GPIO_PIN_SET) {
+        teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT_DEEP;
+    } else {
+        teleop.buttons.lever_right = robot_config::LeverPosition::FRONT;
+    }
 }
 
 }  // namespace
@@ -80,6 +111,7 @@ void setup()
 void loop()
 {
     update_stick_values();
+    update_buttons_value();
     update_heartbeat_led();
 }
 extern "C" {
