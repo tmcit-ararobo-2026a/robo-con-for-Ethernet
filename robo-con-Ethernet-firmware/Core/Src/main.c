@@ -29,6 +29,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "app/app.hpp"
+#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,7 +63,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 int _write(int file, char* ptr, int len)
 {
-    while (CDC_Transmit_FS((uint8_t*)ptr, len) != USBD_OK);
+    while ((CDC_Transmit_FS((uint8_t*)ptr, len) != USBD_OK));
     return len;
 }
 /* USER CODE END 0 */
