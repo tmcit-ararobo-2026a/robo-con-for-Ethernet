@@ -8,9 +8,11 @@
 #include "app/robot_config.hpp"
 #include "app/robot_ethernet.hpp"
 #include "app/stick_config.hpp"
+#include "tim.h"
 
 namespace {
 
+bool timer_triggered = false;
 robot_config::teleop_t teleop;
 RobotEthernet ether;
 uint16_t adc_raw_value[2];
@@ -100,17 +102,8 @@ void update_levers_value()
         }
     }
 }
-}  // namespace
 
-void setup()
-{
-    if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_raw_value, 4) != HAL_OK) {
-        Error_Handler();
-    }
-    ether.init();
-}
-
-void loop()
+void send_teleop()
 {
     // teleopの値を更新
     update_stick_values();
@@ -144,5 +137,29 @@ void loop()
         static_cast<unsigned>(teleop.data_checksum)
     );
 }
+}  // namespace
+
+void setup()
+{
+    if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_raw_value, 4) != HAL_OK) {
+        Error_Handler();
+    }
+    ether.init();
+}
+
+void loop()
+{
+    if (timer_triggered) {
+        send_teleop();
+        timer_triggered = false;
+    }
+}
 extern "C" {
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
+{
+    if (htim->Instance == htim6.Instance) {  // 100Hz timer
+        timer_triggered = true;
+    }
+}
 }
