@@ -15,6 +15,7 @@ on:
 defaults:
   run:
     shell: bash
+    working-directory: robo-con-Ethernet-firmware
 
 # ワークフロー全体のデフォルト権限を最小化する
 permissions: {}
