@@ -98,7 +98,7 @@ void update_levers_value()
             teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT_DEEP;
         }
     }
-
+}
 }  // namespace
 
 void setup()
