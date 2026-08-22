@@ -83,20 +83,21 @@ void update_levers_value()
         }
     }
     /* right lever*/
+    teleop.buttons.lever_right = robot_config::LeverPosition::FRONT;
     if (HAL_GPIO_ReadPin(LEVER_R0_GPIO_Port, LEVER_R0_Pin) == GPIO_PIN_SET) {
         teleop.buttons.lever_right = robot_config::LeverPosition::PUSH;
-    } else if (HAL_GPIO_ReadPin(LEVER_R1_GPIO_Port, LEVER_R1_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_right = robot_config::LeverPosition::LEFT;
-    } else if (HAL_GPIO_ReadPin(LEVER_R2_GPIO_Port, LEVER_R2_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_right = robot_config::LeverPosition::LEFT_DEEP;
-    } else if (HAL_GPIO_ReadPin(LEVER_R3_GPIO_Port, LEVER_R3_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT;
-    } else if (HAL_GPIO_ReadPin(LEVER_R4_GPIO_Port, LEVER_R4_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT_DEEP;
     } else {
-        teleop.buttons.lever_right = robot_config::LeverPosition::FRONT;
+        if (HAL_GPIO_ReadPin(LEVER_R2_GPIO_Port, LEVER_R2_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_right = robot_config::LeverPosition::LEFT;
+        } else if (HAL_GPIO_ReadPin(LEVER_R1_GPIO_Port, LEVER_R1_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_right = robot_config::LeverPosition::LEFT_DEEP;
+        }
+        if (HAL_GPIO_ReadPin(LEVER_R4_GPIO_Port, LEVER_R4_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT;
+        } else if (HAL_GPIO_ReadPin(LEVER_R3_GPIO_Port, LEVER_R3_Pin) == GPIO_PIN_SET) {
+            teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT_DEEP;
+        }
     }
-}
 
 }  // namespace
 
