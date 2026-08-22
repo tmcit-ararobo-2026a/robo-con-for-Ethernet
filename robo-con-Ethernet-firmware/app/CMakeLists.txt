@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 
 add_library(app STATIC
     src/app.cpp
+    src/robot_ethernet.cpp
 )
 
 target_include_directories(app PUBLIC
