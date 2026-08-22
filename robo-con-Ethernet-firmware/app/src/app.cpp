@@ -6,12 +6,13 @@
 
 #include "adc.h"
 #include "app/robot_config.hpp"
+#include "app/robot_ethernet.hpp"
 #include "app/stick_config.hpp"
 
 namespace {
 
 robot_config::teleop_t teleop;
-
+RobotEthernet ether;
 uint16_t adc_raw_value[2];
 /* Hartbeat LED用 */
 constexpr uint32_t k_heartbeat_toggle_interval_ms = 500;
@@ -106,14 +107,19 @@ void setup()
     if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_raw_value, 4) != HAL_OK) {
         Error_Handler();
     }
+    ether.init();
 }
 
 void loop()
 {
+    // teleopの値を更新
     update_stick_values();
     update_buttons_value();
     update_levers_value();
     update_heartbeat_led();
+    // Ethernetで送信
+    ether.send_teleop(teleop);
+    // デバッグ表示
     printf(
         "teleop: header=%u stick_r=(%d,%d) stick_l=(%d,%d) "
         "lever_r=%u lever_l=%u "
