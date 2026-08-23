@@ -28,7 +28,7 @@ void update_heartbeat_led()
     const uint32_t now_ms = HAL_GetTick();
     if ((now_ms - heartbeat_last_toggle_time_ms) >= k_heartbeat_toggle_interval_ms) {
         heartbeat_last_toggle_time_ms = now_ms;
-        HAL_GPIO_TogglePin(LED1_GPIO_Port, LED1_Pin);
+        HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
     }
 }
 
@@ -109,10 +109,10 @@ void send_teleop()
     update_stick_values();
     update_buttons_value();
     update_levers_value();
-    update_heartbeat_led();
     // Ethernetで送信
     ether.send_teleop(teleop);
     // デバッグ表示
+    /*
     printf(
         "teleop: header=%u stick_r=(%d,%d) stick_l=(%d,%d) "
         "lever_r=%u lever_l=%u "
@@ -136,6 +136,8 @@ void send_teleop()
         static_cast<unsigned>(teleop.buttons.triangle),
         static_cast<unsigned>(teleop.data_checksum)
     );
+    */
+    HAL_GPIO_TogglePin(LED4_GPIO_Port, LED4_Pin);
 }
 }  // namespace
 
@@ -144,7 +146,11 @@ void setup()
     if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_raw_value, 4) != HAL_OK) {
         Error_Handler();
     }
-    ether.init();
+    if (!ether.init()) {
+        HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+    }
+    HAL_TIM_Base_Start_IT(&htim6);
+    heartbeat_last_toggle_time_ms = HAL_GetTick();
 }
 
 void loop()

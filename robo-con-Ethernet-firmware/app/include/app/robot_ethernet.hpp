@@ -4,9 +4,7 @@
 class RobotEthernet
 {
 private:
-    uint8_t socket_cmd_    = 0;
-    uint8_t socket_teleop_ = 1;
-    uint8_t socket_debug_  = 2;
+    uint8_t socket_teleop_ = 0;
 
 public:
     bool init();

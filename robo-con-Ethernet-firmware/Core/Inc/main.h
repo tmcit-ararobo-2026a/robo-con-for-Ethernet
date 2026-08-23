@@ -79,7 +79,6 @@ void Error_Handler(void);
 #define SPI1_CS_GPIO_Port GPIOA
 #define W5500_IT_Pin GPIO_PIN_0
 #define W5500_IT_GPIO_Port GPIOB
-#define W5500_IT_EXTI_IRQn EXTI0_IRQn
 #define W5500_RST_Pin GPIO_PIN_1
 #define W5500_RST_GPIO_Port GPIOB
 #define STICK_X_R_Pin GPIO_PIN_11
