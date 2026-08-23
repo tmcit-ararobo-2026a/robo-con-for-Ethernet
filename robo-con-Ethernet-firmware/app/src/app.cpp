@@ -15,7 +15,7 @@ namespace {
 bool timer_triggered = false;
 robot_config::teleop_t teleop;
 RobotEthernet ether;
-uint16_t adc_raw_value[2];
+uint16_t adc_raw_value[4];
 /* Hartbeat LED用 */
 constexpr uint32_t k_heartbeat_toggle_interval_ms = 500;
 uint32_t heartbeat_last_toggle_time_ms            = 0;
@@ -159,6 +159,7 @@ void loop()
         send_teleop();
         timer_triggered = false;
     }
+    update_heartbeat_led();
 }
 extern "C" {
 
