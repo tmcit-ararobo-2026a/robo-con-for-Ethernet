@@ -16,6 +16,37 @@ bool timer_triggered = false;
 robot_config::teleop_t teleop;
 RobotEthernet ether;
 uint16_t adc_raw_value[4];
+void mcu_wake_led()
+{
+    HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED_USB_GPIO_Port, LED_USB_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED_W5500_GPIO_Port, LED_W5500_Pin, GPIO_PIN_SET);
+    HAL_Delay(100);
+
+    HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_RESET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_RESET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED3_GPIO_Port, LED3_Pin, GPIO_PIN_RESET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED4_GPIO_Port, LED4_Pin, GPIO_PIN_RESET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED_USB_GPIO_Port, LED_USB_Pin, GPIO_PIN_RESET);
+    HAL_Delay(100);
+    HAL_GPIO_WritePin(LED_W5500_GPIO_Port, LED_W5500_Pin, GPIO_PIN_RESET);
+}
 /* Hartbeat LED用 */
 constexpr uint32_t k_heartbeat_toggle_interval_ms = 500;
 uint32_t heartbeat_last_toggle_time_ms            = 0;
@@ -157,6 +188,7 @@ void send_teleop()
 
 void setup()
 {
+    mcu_wake_led();
     if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_raw_value, 4) != HAL_OK) {
         Error_Handler();
     }
