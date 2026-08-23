@@ -28,10 +28,24 @@ void update_heartbeat_led()
     const uint32_t now_ms = HAL_GetTick();
     if ((now_ms - heartbeat_last_toggle_time_ms) >= k_heartbeat_toggle_interval_ms) {
         heartbeat_last_toggle_time_ms = now_ms;
+        HAL_GPIO_TogglePin(LED4_GPIO_Port, LED4_Pin);
+    }
+}
+/* TelopRate */
+constexpr uint32_t k_teleop_count_max = 10 / 2;
+uint32_t teleop_count                 = 0;
+/**
+ * @brief 10回に1回LEDをトグルする
+ *
+ */
+void update_teleop_rate_led()
+{
+    teleop_count++;
+    if (teleop_count >= k_teleop_count_max) {
+        teleop_count = 0;
         HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
     }
 }
-
 /**
  * @brief uint16のADC後の値をint8へ正規化
  *
@@ -137,7 +151,7 @@ void send_teleop()
         static_cast<unsigned>(teleop.data_checksum)
     );
     */
-    HAL_GPIO_TogglePin(LED4_GPIO_Port, LED4_Pin);
+    update_teleop_rate_led();
 }
 }  // namespace
 
@@ -146,11 +160,12 @@ void setup()
     if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_raw_value, 4) != HAL_OK) {
         Error_Handler();
     }
-    if (!ether.init()) {
-        HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
+    if (ether.init()) {
+        HAL_GPIO_WritePin(LED_W5500_GPIO_Port, LED_W5500_Pin, GPIO_PIN_SET);
     }
     HAL_TIM_Base_Start_IT(&htim6);
     heartbeat_last_toggle_time_ms = HAL_GetTick();
+    HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin, GPIO_PIN_SET);
 }
 
 void loop()
