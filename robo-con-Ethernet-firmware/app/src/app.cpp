@@ -78,25 +78,39 @@ void update_teleop_rate_led()
     }
 }
 /**
- * @brief uint16のADC後の値をint8へ正規化
+ * @brief uint16のADC後の値をint8へ正規化（デッドゾーン処理付き）
  *
  * @param target_adc_buffer 処理するADC値
- * @param zero_reference ADCのどの値をゼロとするか
- * @param min スティックのADC後最小値
- * @param max スティックのADC後最大値
+ * @param zero_reference ADCのセンター（中立）値
+ * @param min センターからの負方向の最大偏差（負の整数、例: -115）
+ * @param max センターからの正方向の最大偏差（正の整数、例: 115）
  */
 int8_t normalize_adc_value(uint16_t target_adc_buffer, int zero_reference, int min, int max)
 {
-    int normalized_value  = 0;
-    normalized_value      = target_adc_buffer - zero_reference;
-    normalized_value      = std::clamp(normalized_value, INT8_MIN, INT8_MAX);
-    int dead_zone_applied = 0;
-    if (normalized_value > STICK_CENTER_MARGIN) {
-        dead_zone_applied = normalized_value * (STICK_REFERENCE_MAX / (max - STICK_CENTER_MARGIN));
-    } else if (normalized_value < -STICK_CENTER_MARGIN) {
-        dead_zone_applied = normalized_value * (STICK_REFERENCE_MAX / (-min - STICK_CENTER_MARGIN));
+    // センター位置からの偏差を計算
+    int diff = static_cast<int>(target_adc_buffer) - zero_reference;
+
+    // デッドゾーン（±10）の範囲内なら 0 を返す
+    if (std::abs(diff) <= STICK_CENTER_MARGIN) {
+        return 0;
     }
-    return (int8_t)dead_zone_applied;
+
+    int scaled_value = 0;
+
+    if (diff > STICK_CENTER_MARGIN) {
+        // 正の方向: デッドゾーンを超えた分を 0 ~ STICK_REFERENCE_MAX にスケーリング
+        const int effective_range = max - STICK_CENTER_MARGIN;
+        if (effective_range > 0) {
+            scaled_value = (diff - STICK_CENTER_MARGIN) * STICK_REFERENCE_MAX / effective_range;
+        }
+    } else {
+        // 負の方向: デッドゾーンを超えた分を 0 ~ -STICK_REFERENCE_MAX にスケーリング
+        const int effective_range = -min - STICK_CENTER_MARGIN;  // -min で絶対値化
+        if (effective_range > 0) {
+            scaled_value = (diff + STICK_CENTER_MARGIN) * (-STICK_REFERENCE_MAX) / effective_range;
+        }
+    }
+    return static_cast<int8_t>(std::clamp(scaled_value, -STICK_REFERENCE_MAX, STICK_REFERENCE_MAX));
 }
 
 void update_stick_values()

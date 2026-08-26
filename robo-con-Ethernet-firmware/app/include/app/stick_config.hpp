@@ -1,7 +1,7 @@
 #pragma once
 
 // 基準
-#define STICK_REFERENCE_MAX 125
+#define STICK_REFERENCE_MAX 127
 // 各スティックの状態
 #define STICK_X_R_CENTER 129
 #define STICK_Y_R_CENTER 124
