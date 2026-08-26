@@ -82,21 +82,33 @@ void update_teleop_rate_led()
  *
  * @param target_adc_buffer 処理するADC値
  * @param zero_reference ADCのどの値をゼロとするか
+ * @param min スティックのADC後最小値
+ * @param max スティックのADC後最大値
  */
-int8_t normalize_adc_value(uint16_t target_adc_buffer, uint16_t zero_reference)
+int8_t normalize_adc_value(uint16_t target_adc_buffer, int zero_reference, int min, int max)
 {
-    int normalized_value = 0;
-    normalized_value     = target_adc_buffer - zero_reference;
-    normalized_value     = std::clamp(normalized_value, INT8_MIN, INT8_MAX);
-    return (int8_t)normalized_value;
+    int normalized_value  = 0;
+    normalized_value      = target_adc_buffer - zero_reference;
+    normalized_value      = std::clamp(normalized_value, INT8_MIN, INT8_MAX);
+    int dead_zone_applied = 0;
+    if (normalized_value > STICK_CENTER_MARGIN) {
+        dead_zone_applied = normalized_value * (STICK_REFERENCE_MAX / (max - STICK_CENTER_MARGIN));
+    } else if (normalized_value < -STICK_CENTER_MARGIN) {
+        dead_zone_applied = normalized_value * (STICK_REFERENCE_MAX / (-min - STICK_CENTER_MARGIN));
+    }
+    return (int8_t)dead_zone_applied;
 }
 
 void update_stick_values()
 {
-    teleop.analog.stick_right[0] = -normalize_adc_value(adc_raw_value[3], STICK_X_R_CENTER);
-    teleop.analog.stick_right[1] = normalize_adc_value(adc_raw_value[2], STICK_Y_R_CENTER);
-    teleop.analog.stick_left[0]  = -normalize_adc_value(adc_raw_value[0], STICK_X_L_CENTER);
-    teleop.analog.stick_left[1]  = normalize_adc_value(adc_raw_value[1], STICK_Y_L_CENTER);
+    teleop.analog.stick_right[0] =
+        -normalize_adc_value(adc_raw_value[3], STICK_X_R_CENTER, STICK_X_R_MIN, STICK_X_R_MAX);
+    teleop.analog.stick_right[1] =
+        normalize_adc_value(adc_raw_value[2], STICK_Y_R_CENTER, STICK_Y_R_MIN, STICK_Y_R_MAX);
+    teleop.analog.stick_left[0] =
+        -normalize_adc_value(adc_raw_value[0], STICK_X_L_CENTER, STICK_X_L_MIN, STICK_X_L_MAX);
+    teleop.analog.stick_left[1] =
+        normalize_adc_value(adc_raw_value[1], STICK_Y_L_CENTER, STICK_Y_L_MIN, STICK_Y_L_MAX);
 }
 
 void update_buttons_value()
