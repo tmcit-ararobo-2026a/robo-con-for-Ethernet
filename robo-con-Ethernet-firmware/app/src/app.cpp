@@ -105,9 +105,9 @@ int8_t normalize_adc_value(uint16_t target_adc_buffer, int zero_reference, int m
         }
     } else {
         // 負の方向: デッドゾーンを超えた分を 0 ~ -STICK_REFERENCE_MAX にスケーリング
-        const int effective_range = -min - STICK_CENTER_MARGIN;  // -min で絶対値化
+        const int effective_range = std::abs(min) - STICK_CENTER_MARGIN;  // -min で絶対値化
         if (effective_range > 0) {
-            scaled_value = (diff + STICK_CENTER_MARGIN) * (-STICK_REFERENCE_MAX) / effective_range;
+            scaled_value = (diff + STICK_CENTER_MARGIN) * STICK_REFERENCE_MAX / effective_range;
         }
     }
     return static_cast<int8_t>(std::clamp(scaled_value, -STICK_REFERENCE_MAX, STICK_REFERENCE_MAX));
