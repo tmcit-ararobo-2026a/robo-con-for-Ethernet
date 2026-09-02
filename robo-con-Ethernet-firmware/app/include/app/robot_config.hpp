@@ -57,26 +57,19 @@ struct command_t {
     float angular_vel;  //[rad/s]
     // バケツ用アーム 2byte
     uint8_t bucket_arm_hight;  //[cm]
-    uint8_t bucket_arm_hold;
-    // 装填機構 2byte
-    uint8_t loading_hook_phase;  //[phase]
-    bool loading_shift_cloth;
+    bool bucket_arm_hold;
     // ベルト直動 6byte
     float belt_vel;  //[m/s]
     bool belt_throw;
     bool belt_init;
     // エアシリンダー射出 3byte
-    bool air_rauncher_for_flag;
-    bool air_rauncher_for_desk_r;
-    bool air_rauncher_for_desk_l;
-    // 机上雑巾回収 2byte
-    uint8_t desk_arm_pos;  //[cm]
-    bool desk_arm_hold;
-    // 状態表示 2byte
-    int8_t target_bucket_angle_roll;
-    int8_t target_bucket_angle_pitch;
-    // 予備 2byte
-    uint8_t reserved[2];
+    bool air_launcher_for_flag;
+    bool air_launcher_for_desk_r;
+    bool air_launcher_for_desk_l;
+    // 装填処理 1byte
+    bool loading;
+    // 予備 7byte
+    uint8_t reserved[7];
 } __attribute__((__packed__));
 
 union command_u {
@@ -92,6 +85,7 @@ static_assert(sizeof(command_t) == 32);
  */
 struct feedback_t {
     uint8_t header;  // ヘッダー
+    float belt_vel_last;
 } __attribute__((__packed__));
 
 union feedback_u {
@@ -99,7 +93,7 @@ union feedback_u {
     uint8_t binary[sizeof(feedback_t)];
 } __attribute__((__packed__));
 
-static_assert(sizeof(feedback_t) == 1);
+static_assert(sizeof(feedback_t) == 5);
 
 /**
  * @brief 操縦デバイスのレバーの傾きと押し込み
@@ -131,13 +125,13 @@ struct teleop_t {
         LeverPosition lever_left  : 3;
         uint8_t stick_push_right  : 1;
         uint8_t stick_push_left   : 1;
-        uint8_t up                : 1;
-        uint8_t down              : 1;
-        uint8_t right             : 1;
-        uint8_t left              : 1;
-        uint8_t circle            : 1;
-        uint8_t cross             : 1;
-        uint8_t triangle          : 1;
+        uint8_t left_up           : 1;
+        uint8_t left_down         : 1;
+        uint8_t left_right        : 1;
+        uint8_t left_left         : 1;
+        uint8_t right_right       : 1;
+        uint8_t right_up          : 1;
+        uint8_t right_down        : 1;
         uint8_t reserved          : 1;
     } __attribute__((__packed__)) buttons;  // 2byte
 
@@ -162,6 +156,9 @@ static_assert(sizeof(teleop_t) == 8);
 struct debug_pc_t {
     uint8_t header;  // ヘッダー
     bool jetson_restart;
+    bool jetson_shutdown;
+    bool node_start;
+    bool node_stop;
 } __attribute__((__packed__));
 
 union debug_pc_u {
