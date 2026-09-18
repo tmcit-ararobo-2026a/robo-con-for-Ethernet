@@ -185,27 +185,16 @@ void send_teleop()
     // デバッグ表示
     /*
     printf(
-        "teleop: header=%u stick_r=(%d,%d) stick_l=(%d,%d) "
-        "lever_r=%u lever_l=%u "
-        "push_r=%u push_l=%u buttons=(up:%u down:%u right:%u left:%u "
-        "circle:%u cross:%u triangle:%u) checksum=%u\r\n",
-        static_cast<unsigned>(teleop.header),
-        teleop.analog.stick_right[0],
-        teleop.analog.stick_right[1],
-        teleop.analog.stick_left[0],
+        "teleop: stick_r=(%d,%d) stick_l=(%d,%d), buttons: right: %d, %d, %d, left: %d, %d, %d,
+    %d\n", teleop.analog.stick_right[0], teleop.analog.stick_right[1], teleop.analog.stick_left[0],
         teleop.analog.stick_left[1],
-        static_cast<unsigned>(teleop.buttons.lever_right),
-        static_cast<unsigned>(teleop.buttons.lever_left),
-        static_cast<unsigned>(teleop.buttons.stick_push_right),
-        static_cast<unsigned>(teleop.buttons.stick_push_left),
-        static_cast<unsigned>(teleop.buttons.up),
-        static_cast<unsigned>(teleop.buttons.down),
-        static_cast<unsigned>(teleop.buttons.right),
-        static_cast<unsigned>(teleop.buttons.left),
-        static_cast<unsigned>(teleop.buttons.circle),
-        static_cast<unsigned>(teleop.buttons.cross),
-        static_cast<unsigned>(teleop.buttons.triangle),
-        static_cast<unsigned>(teleop.data_checksum)
+        teleop.buttons.right_up,
+        teleop.buttons.right_down,
+        teleop.buttons.right_right,
+        teleop.buttons.left_up,
+        teleop.buttons.left_down,
+        teleop.buttons.left_right,
+        teleop.buttons.left_left
     );
     */
     update_teleop_rate_led();

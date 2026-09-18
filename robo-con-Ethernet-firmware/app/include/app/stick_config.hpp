@@ -1,19 +1,23 @@
 #pragma once
+// rx 54 128 134 213
+// ry 43 123 129 196
+// lx 44 121 128 207
+// ly 40 123 130 200
 
 // 基準
 #define STICK_REFERENCE_MAX 127
 // 各スティックの状態
-#define STICK_X_R_CENTER 129
+#define STICK_X_R_CENTER 132
 #define STICK_Y_R_CENTER 124
 #define STICK_X_L_CENTER 125
-#define STICK_Y_L_CENTER 127
-#define STICK_X_R_MIN    -115
-#define STICK_Y_R_MIN    -115
-#define STICK_X_L_MIN    -115
-#define STICK_Y_L_MIN    -115
-#define STICK_X_R_MAX    115
-#define STICK_Y_R_MAX    115
-#define STICK_X_L_MAX    115
-#define STICK_Y_L_MAX    115
+#define STICK_Y_L_CENTER 124
+#define STICK_X_R_MIN    54 - STICK_X_R_CENTER
+#define STICK_Y_R_MIN    43 - STICK_Y_R_CENTER
+#define STICK_X_L_MIN    44 - STICK_X_L_CENTER
+#define STICK_Y_L_MIN    40 - STICK_Y_L_CENTER
+#define STICK_X_R_MAX    213 - STICK_X_R_CENTER
+#define STICK_Y_R_MAX    196 - STICK_Y_R_CENTER
+#define STICK_X_L_MAX    207 - STICK_X_L_CENTER
+#define STICK_Y_L_MAX    200 - STICK_Y_L_CENTER
 // 不感帯幅
-#define STICK_CENTER_MARGIN 10
+#define STICK_CENTER_MARGIN 6
