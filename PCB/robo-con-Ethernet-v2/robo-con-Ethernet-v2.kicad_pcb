@@ -38162,7 +38162,7 @@
 		)
 	)
 	(gr_text "POWER"
-		(at 182.9 46.8 90)
+		(at 182.5 46 90)
 		(layer "F.SilkS")
 		(uuid "bb8764da-e5e6-419d-92fe-bc5504ec8d93")
 		(effects
