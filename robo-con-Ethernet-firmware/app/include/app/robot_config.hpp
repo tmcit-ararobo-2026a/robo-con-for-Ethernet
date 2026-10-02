@@ -2,10 +2,10 @@
  * @file robot_data_config.hpp
  * @author tmcit-ararobo-2026a
  * @brief ロボットの通信データ構造体定義
- * @version 2.1
- * @date 2025-10-03
+ * @version 2.2
+ * @date 2026-09-07
  *
- * @copyright Copyright (c) 2025
+ * @copyright Copyright (c) 2026
  *
  * socket_cmd (port:26574)
  *  |-  operation    pc          ->  main-board
@@ -45,31 +45,25 @@ constexpr uint8_t teleop[]    = {192, 168, 2, 2};
 }  // namespace ip
 
 /**
- * @brief ロボットの動作司令値 32byte
+ * @brief ロボットの動作司令値 44byte
  *
  */
 struct command_t {
     // 識別ヘッダー 1byte
     uint8_t header;
-    // 足回り 12byte
-    float x_vel;        //[m/s]
-    float y_vel;        //[m/s]
-    float angular_vel;  //[rad/s]
-    // バケツ用アーム 2byte
-    uint8_t bucket_arm_hight;  //[cm]
-    bool bucket_arm_hold;
-    // ベルト直動 6byte
-    float belt_vel;  //[m/s]
-    bool belt_throw;
-    bool belt_init;
-    // エアシリンダー射出 3byte
-    bool air_launcher_for_flag;
-    bool air_launcher_for_desk_r;
-    bool air_launcher_for_desk_l;
-    // 装填処理 1byte
-    bool loading;
-    // 予備 7byte
-    uint8_t reserved[7];
+    uint8_t reserved[1];
+    bool estimated_success;           // 自己位置推定成功
+    bool belt_launcher_ready;         // 射程合わせOK
+    float vel_x;                      // 移動司令値[m/s]
+    float vel_y;                      // 移動司令値[m/s]
+    float vel_yaw;                    // 移動司令値[rad/s]
+    float belt_launcher_speed;        // ベルト直動の速度司令値（自動計算）[m/s]
+    float move_bucket_angle_yaw_rad;  // ロボット座標系における移動バケツの水平角[rad]
+    float bucket1_angle_yaw_rad;      // ロボット座標系におけるバケツ1の水平角[rad]
+    float bucket2_angle_yaw_rad;      // ロボット座標系におけるバケツ2の水平角[rad]
+    float bucket3_angle_yaw_rad;      // ロボット座標系におけるバケツ3の水平角[rad]
+    float flag_angle_yaw_rad;         // ロボット座標系における旗の水平角[rad]
+    float desk_angle_yaw_rad;         // ロボット座標系における机の水平角[rad]
 } __attribute__((__packed__));
 
 union command_u {
@@ -77,15 +71,28 @@ union command_u {
     uint8_t binary[sizeof(command_t)];  // 送信バイト配列
 } __attribute__((__packed__));
 
-static_assert(sizeof(command_t) == 32);
+static_assert(sizeof(command_t) == 44);
 
 /**
  * @brief ロボットのセンサ値などのフィードバック
  *
  */
 struct feedback_t {
-    uint8_t header;  // ヘッダー
-    float belt_vel_last;
+    uint8_t header;    // ヘッダー
+    uint8_t sequence;  // シーケンス番号
+    // 電源周り
+    bool emergency_stop_enabled;
+    bool over_current;
+    float drive_battery_voltages;
+    float drive_current;
+    // 記録用
+    float belt_launcher_target_velocity;        // 目標速度[m/s]
+    float last_belt_launcher_release_velocity;  // 射出リリース時の初速[m/s]
+    // 各アクチュエータのフィードバック
+    float wheel_angular_velocity[3];  // 0:front 1:left 2:right
+    float belt_launcher_velocity;     // 現在のベルト直動の速度[m/s]
+    float loading_belt_angle;         // 装填機構のプーリー角度[rad]
+    float bucket_arm_height;          // バケツアームの高さ[m]
 } __attribute__((__packed__));
 
 union feedback_u {
@@ -93,20 +100,7 @@ union feedback_u {
     uint8_t binary[sizeof(feedback_t)];
 } __attribute__((__packed__));
 
-static_assert(sizeof(feedback_t) == 5);
-
-/**
- * @brief 操縦デバイスのレバーの傾きと押し込み
- *
- */
-enum class LeverPosition : uint8_t {
-    FRONT,
-    RIGHT,
-    RIGHT_DEEP,
-    LEFT,
-    LEFT_DEEP,
-    PUSH,
-};
+static_assert(sizeof(feedback_t) == 44);
 
 /**
  * @brief ロボットの操縦信号値
@@ -121,18 +115,22 @@ struct teleop_t {
     } __attribute__((__packed__)) analog;  // 4byte
 
     struct {
-        LeverPosition lever_right : 3;
-        LeverPosition lever_left  : 3;
-        uint8_t stick_push_right  : 1;
-        uint8_t stick_push_left   : 1;
-        uint8_t left_up           : 1;
-        uint8_t left_down         : 1;
-        uint8_t left_right        : 1;
-        uint8_t left_left         : 1;
-        uint8_t right_right       : 1;
-        uint8_t right_up          : 1;
-        uint8_t right_down        : 1;
-        uint8_t reserved          : 1;
+        uint8_t stick_push_right : 1;  // 右スティック押し込み
+        uint8_t stick_push_left  : 1;  // 左スティック押し込み
+        uint8_t left_up          : 1;  // 左十字キーの上ボタン
+        uint8_t left_down        : 1;  // 左十字キーの下ボタン
+        uint8_t left_right       : 1;  // 左十字キーの右ボタン
+        uint8_t left_left        : 1;  // 左十字キーの左ボタン
+        uint8_t right_up         : 1;  // 右十字キーの上ボタン
+        uint8_t right_down       : 1;  // 右十字キーの下ボタン
+        uint8_t right_right      : 1;  // 右十字キーの右ボタン
+        uint8_t right_left       : 1;  // 右十字キーの左ボタン
+        uint8_t left_trigger     : 1;  // 左のトリガボタン（旧レバー）
+        uint8_t right_trigger    : 1;  // 右のトリガボタン（旧レバー）
+        uint8_t left_toggle_sw   : 1;  // 左モード指定用トグルスイッチ（上に倒すと:1）
+        uint8_t right_toggle_sw  : 1;  // 左モード指定用トグルスイッチ（上に倒すと:1）
+        uint8_t reserved_1       : 1;
+        uint8_t reserved_2       : 1;
     } __attribute__((__packed__)) buttons;  // 2byte
 
     /**
