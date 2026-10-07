@@ -138,48 +138,11 @@ void update_buttons_value()
     teleop.buttons.stick_push_right = HAL_GPIO_ReadPin(STICK_PUSH_R_GPIO_Port, STICK_PUSH_R_Pin);
 }
 
-void update_levers_value()
-{
-    /* left lever*/
-    teleop.buttons.lever_left = robot_config::LeverPosition::FRONT;
-    if (HAL_GPIO_ReadPin(LEVER_L0_GPIO_Port, LEVER_L0_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_left = robot_config::LeverPosition::PUSH;
-    } else {
-        if (HAL_GPIO_ReadPin(LEVER_L2_GPIO_Port, LEVER_L2_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_left = robot_config::LeverPosition::LEFT_DEEP;
-        } else if (HAL_GPIO_ReadPin(LEVER_L1_GPIO_Port, LEVER_L1_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_left = robot_config::LeverPosition::LEFT;
-        }
-        if (HAL_GPIO_ReadPin(LEVER_L4_GPIO_Port, LEVER_L4_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT_DEEP;
-        } else if (HAL_GPIO_ReadPin(LEVER_L3_GPIO_Port, LEVER_L3_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_left = robot_config::LeverPosition::RIGHT;
-        }
-    }
-    /* right lever*/
-    teleop.buttons.lever_right = robot_config::LeverPosition::FRONT;
-    if (HAL_GPIO_ReadPin(LEVER_R0_GPIO_Port, LEVER_R0_Pin) == GPIO_PIN_SET) {
-        teleop.buttons.lever_right = robot_config::LeverPosition::PUSH;
-    } else {
-        if (HAL_GPIO_ReadPin(LEVER_R2_GPIO_Port, LEVER_R2_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_right = robot_config::LeverPosition::LEFT;
-        } else if (HAL_GPIO_ReadPin(LEVER_R1_GPIO_Port, LEVER_R1_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_right = robot_config::LeverPosition::LEFT_DEEP;
-        }
-        if (HAL_GPIO_ReadPin(LEVER_R4_GPIO_Port, LEVER_R4_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT;
-        } else if (HAL_GPIO_ReadPin(LEVER_R3_GPIO_Port, LEVER_R3_Pin) == GPIO_PIN_SET) {
-            teleop.buttons.lever_right = robot_config::LeverPosition::RIGHT_DEEP;
-        }
-    }
-}
-
 void send_teleop()
 {
     // teleopの値を更新
     update_stick_values();
     update_buttons_value();
-    update_levers_value();
     // Ethernetで送信
     ether.send_teleop(teleop);
     // デバッグ表示
