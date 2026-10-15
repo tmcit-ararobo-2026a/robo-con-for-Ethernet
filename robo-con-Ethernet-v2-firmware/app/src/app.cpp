@@ -130,16 +130,24 @@ void update_stick_values()
 
 void update_buttons_value()
 {
-    teleop.buttons.left_up          = HAL_GPIO_ReadPin(BUTTON_L1_GPIO_Port, BUTTON_L1_Pin);
-    teleop.buttons.left_down        = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
-    teleop.buttons.left_right       = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
-    teleop.buttons.left_left        = HAL_GPIO_ReadPin(BUTTON_L4_GPIO_Port, BUTTON_L4_Pin);
-    teleop.buttons.right_right      = HAL_GPIO_ReadPin(BUTTON_R1_GPIO_Port, BUTTON_R1_Pin);
-    teleop.buttons.right_up         = HAL_GPIO_ReadPin(BUTTON_R2_GPIO_Port, BUTTON_R2_Pin);
-    teleop.buttons.right_down       = HAL_GPIO_ReadPin(BUTTON_R3_GPIO_Port, BUTTON_R3_Pin);
-    teleop.buttons.right_left       = HAL_GPIO_ReadPin(BUTTON_R4_GPIO_Port, BUTTON_R4_Pin);
+    teleop.buttons.left_up    = HAL_GPIO_ReadPin(BUTTON_L1_GPIO_Port, BUTTON_L1_Pin);
+    teleop.buttons.left_down  = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
+    teleop.buttons.left_right = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
+    teleop.buttons.left_left  = HAL_GPIO_ReadPin(BUTTON_L4_GPIO_Port, BUTTON_L4_Pin);
+
+    teleop.buttons.right_right = HAL_GPIO_ReadPin(BUTTON_R1_GPIO_Port, BUTTON_R1_Pin);
+    teleop.buttons.right_up    = HAL_GPIO_ReadPin(BUTTON_R2_GPIO_Port, BUTTON_R2_Pin);
+    teleop.buttons.right_down  = HAL_GPIO_ReadPin(BUTTON_R3_GPIO_Port, BUTTON_R3_Pin);
+    teleop.buttons.right_left  = HAL_GPIO_ReadPin(BUTTON_R4_GPIO_Port, BUTTON_R4_Pin);
+
     teleop.buttons.stick_push_left  = HAL_GPIO_ReadPin(STICK_L_PUSH_GPIO_Port, STICK_L_PUSH_Pin);
     teleop.buttons.stick_push_right = HAL_GPIO_ReadPin(STICK_R_PUSH_GPIO_Port, STICK_R_PUSH_Pin);
+
+    teleop.buttons.left_toggle_sw  = !HAL_GPIO_ReadPin(TOGGLE_L_GPIO_Port, TOGGLE_L_Pin);
+    teleop.buttons.right_toggle_sw = !HAL_GPIO_ReadPin(TOGGLE_R_GPIO_Port, TOGGLE_R_Pin);
+
+    teleop.buttons.left_trigger  = HAL_GPIO_ReadPin(TRIGGER_L_GPIO_Port, TRIGGER_L_Pin);
+    teleop.buttons.right_trigger = HAL_GPIO_ReadPin(TRIGGER_R_GPIO_Port, TRIGGER_R_Pin);
 }
 
 void send_teleop()

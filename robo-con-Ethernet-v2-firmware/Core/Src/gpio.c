@@ -83,10 +83,10 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(TOGGLE_R_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : LEVER_R_Pin BUTTON_R4_Pin BUTTON_R3_Pin BUTTON_L2_Pin
-                           BUTTON_L3_Pin BUTTON_L4_Pin LEVER_L_Pin */
-  GPIO_InitStruct.Pin = LEVER_R_Pin|BUTTON_R4_Pin|BUTTON_R3_Pin|BUTTON_L2_Pin
-                          |BUTTON_L3_Pin|BUTTON_L4_Pin|LEVER_L_Pin;
+  /*Configure GPIO pins : TRIGGER_R_Pin BUTTON_R4_Pin BUTTON_R3_Pin BUTTON_L2_Pin
+                           BUTTON_L3_Pin BUTTON_L4_Pin TRIGGER_L_Pin */
+  GPIO_InitStruct.Pin = TRIGGER_R_Pin|BUTTON_R4_Pin|BUTTON_R3_Pin|BUTTON_L2_Pin
+                          |BUTTON_L3_Pin|BUTTON_L4_Pin|TRIGGER_L_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);

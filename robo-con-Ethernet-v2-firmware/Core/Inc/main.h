@@ -69,8 +69,8 @@ void Error_Handler(void);
 #define LED_LIPO_GPIO_Port GPIOA
 #define TOGGLE_R_Pin GPIO_PIN_1
 #define TOGGLE_R_GPIO_Port GPIOA
-#define LEVER_R_Pin GPIO_PIN_2
-#define LEVER_R_GPIO_Port GPIOA
+#define TRIGGER_R_Pin GPIO_PIN_2
+#define TRIGGER_R_GPIO_Port GPIOA
 #define LIPO_VOLTAGE_Pin GPIO_PIN_3
 #define LIPO_VOLTAGE_GPIO_Port GPIOA
 #define STICK_R_Y_Pin GPIO_PIN_4
@@ -101,8 +101,8 @@ void Error_Handler(void);
 #define BUTTON_L3_GPIO_Port GPIOA
 #define BUTTON_L4_Pin GPIO_PIN_10
 #define BUTTON_L4_GPIO_Port GPIOA
-#define LEVER_L_Pin GPIO_PIN_15
-#define LEVER_L_GPIO_Port GPIOA
+#define TRIGGER_L_Pin GPIO_PIN_15
+#define TRIGGER_L_GPIO_Port GPIOA
 #define LED0_Pin GPIO_PIN_10
 #define LED0_GPIO_Port GPIOC
 #define LED1_Pin GPIO_PIN_11
