@@ -15,7 +15,8 @@ namespace {
 bool timer_triggered = false;
 robot_config::teleop_t teleop;
 RobotEthernet ether;
-uint16_t adc_raw_value[4];
+uint16_t stick_adc_raw_value[4];
+uint16_t voltage_adc_raw_value[1];
 void mcu_wake_led()
 {
     HAL_GPIO_WritePin(LED0_GPIO_Port, LED0_Pin, GPIO_PIN_SET);
@@ -115,14 +116,16 @@ int8_t normalize_adc_value(uint16_t target_adc_buffer, int zero_reference, int m
 
 void update_stick_values()
 {
-    teleop.analog.stick_right[0] =
-        -normalize_adc_value(adc_raw_value[3], STICK_X_R_CENTER, STICK_X_R_MIN, STICK_X_R_MAX);
+    teleop.analog.stick_right[0] = -normalize_adc_value(
+        stick_adc_raw_value[0], STICK_X_R_CENTER, STICK_X_R_MIN, STICK_X_R_MAX
+    );
     teleop.analog.stick_right[1] =
-        normalize_adc_value(adc_raw_value[2], STICK_Y_R_CENTER, STICK_Y_R_MIN, STICK_Y_R_MAX);
-    teleop.analog.stick_left[0] =
-        -normalize_adc_value(adc_raw_value[0], STICK_X_L_CENTER, STICK_X_L_MIN, STICK_X_L_MAX);
+        normalize_adc_value(stick_adc_raw_value[1], STICK_Y_R_CENTER, STICK_Y_R_MIN, STICK_Y_R_MAX);
+    teleop.analog.stick_left[0] = -normalize_adc_value(
+        stick_adc_raw_value[2], STICK_X_L_CENTER, STICK_X_L_MIN, STICK_X_L_MAX
+    );
     teleop.analog.stick_left[1] =
-        normalize_adc_value(adc_raw_value[1], STICK_Y_L_CENTER, STICK_Y_L_MIN, STICK_Y_L_MAX);
+        normalize_adc_value(stick_adc_raw_value[3], STICK_Y_L_CENTER, STICK_Y_L_MIN, STICK_Y_L_MAX);
 }
 
 void update_buttons_value()
@@ -131,11 +134,12 @@ void update_buttons_value()
     teleop.buttons.left_down        = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
     teleop.buttons.left_right       = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
     teleop.buttons.left_left        = HAL_GPIO_ReadPin(BUTTON_L4_GPIO_Port, BUTTON_L4_Pin);
-    teleop.buttons.right_right      = HAL_GPIO_ReadPin(BUTTON_R5_GPIO_Port, BUTTON_R5_Pin);
-    teleop.buttons.right_up         = HAL_GPIO_ReadPin(BUTTON_R6_GPIO_Port, BUTTON_R6_Pin);
-    teleop.buttons.right_down       = HAL_GPIO_ReadPin(BUTTON_R7_GPIO_Port, BUTTON_R7_Pin);
-    teleop.buttons.stick_push_left  = HAL_GPIO_ReadPin(STICK_PUSH_L_GPIO_Port, STICK_PUSH_L_Pin);
-    teleop.buttons.stick_push_right = HAL_GPIO_ReadPin(STICK_PUSH_R_GPIO_Port, STICK_PUSH_R_Pin);
+    teleop.buttons.right_right      = HAL_GPIO_ReadPin(BUTTON_R1_GPIO_Port, BUTTON_R1_Pin);
+    teleop.buttons.right_up         = HAL_GPIO_ReadPin(BUTTON_R2_GPIO_Port, BUTTON_R2_Pin);
+    teleop.buttons.right_down       = HAL_GPIO_ReadPin(BUTTON_R3_GPIO_Port, BUTTON_R3_Pin);
+    teleop.buttons.right_left       = HAL_GPIO_ReadPin(BUTTON_R4_GPIO_Port, BUTTON_R4_Pin);
+    teleop.buttons.stick_push_left  = HAL_GPIO_ReadPin(STICK_L_PUSH_GPIO_Port, STICK_L_PUSH_Pin);
+    teleop.buttons.stick_push_right = HAL_GPIO_ReadPin(STICK_R_PUSH_GPIO_Port, STICK_R_PUSH_Pin);
 }
 
 void send_teleop()
@@ -167,7 +171,11 @@ void send_teleop()
 void setup()
 {
     mcu_wake_led();
-    if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_raw_value, 4) != HAL_OK) {
+    if (HAL_ADC_Start_DMA(&hadc1, (uint32_t*)voltage_adc_raw_value, 1) != HAL_OK) {
+        Error_Handler();
+    }
+
+    if (HAL_ADC_Start_DMA(&hadc2, (uint32_t*)stick_adc_raw_value, 4) != HAL_OK) {
         Error_Handler();
     }
     if (ether.init()) {
