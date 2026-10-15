@@ -1,0 +1,198 @@
+/**
+ * @file robot_data_config.hpp
+ * @author tmcit-ararobo-2026a
+ * @brief ロボットの通信データ構造体定義
+ * @version 3.0
+ * @date 2026-10-05
+ *
+ * @copyright Copyright (c) 2026
+ *
+ * socket_command (port:26574)
+ *  |-  command      main-board  ->  pc
+ *
+ * socket_operation (port:39244)
+ *  |-  operation    pc          ->  main-board
+ *  |-  feedback     main-board  ->  pc
+ *
+ * socket_teleop (port:10410)
+ *  |-  teleop            robo-con    ->  pc ( main (in debug_mode))
+ */
+#pragma once
+#include <stdint.h>
+
+namespace robot_config {
+
+namespace header {
+constexpr uint8_t command   = 0x38;
+constexpr uint8_t operation = 0xAB;
+constexpr uint8_t feedback  = 0x55;
+constexpr uint8_t teleop    = 0xAA;
+}  // namespace header
+
+namespace port {
+constexpr uint16_t command   = 26574;
+constexpr uint16_t operation = 39244;
+constexpr uint16_t teleop    = 10410;
+}  // namespace port
+
+namespace ip {
+constexpr uint8_t mainboard[] = {192, 168, 3, 2};
+constexpr uint8_t pc_robot[]  = {192, 168, 3, 1};
+constexpr uint8_t pc_wifi[]   = {192, 168, 2, 1};
+constexpr uint8_t teleop[]    = {192, 168, 2, 2};
+}  // namespace ip
+
+enum class TargetId : uint8_t {
+    StartZone,
+    FixedBucket1,
+    FixedBucket2,
+    FixedBucket3,
+    Desk1,
+    Desk2,
+    Flag,
+    MovingBucket,
+};
+
+enum class NavigationStatus : uint8_t {
+    Stanby,
+    Ready,
+    Moving,
+    Tracking,
+    Goal,
+    Fail,
+};
+
+enum class NavigationCommand : uint8_t {
+    Sleep,  // ナビゲーションモードではないので休む
+    Stanby,  // 命令なし（自動移動であればゴール達成後は何もしない。トラッキングであれば即座にやめる。）
+    Move,  // 移動命令がある
+};
+
+struct command_t {
+    uint8_t header;
+    uint8_t sequence;
+    // Jetsonの操作
+    bool shutdown;
+    bool localization;
+    bool logging;
+    // 自動操縦
+    TargetId target_id;
+    NavigationCommand navigation_command;
+    bool cloth_collect;
+
+} __attribute__((__packed__));
+
+union command_u {
+    command_t value;
+    uint8_t binary[sizeof(command_t)];
+} __attribute__((__packed__));
+
+static_assert(sizeof(command_t) == 8);
+
+/**
+ * @brief ロボットの動作 44byte
+ *
+ */
+struct operation_t {
+    // 識別ヘッダー 1byte
+    uint8_t header;
+    uint8_t reserved[1];
+    TargetId target_id;
+    NavigationStatus navigation_status;
+    float vel_x;                    // 移動司令値[m/s]
+    float vel_y;                    // 移動司令値[m/s]
+    float vel_yaw;                  // 移動司令値[rad/s]
+    float belt_launcher_speed;      // ベルト直動の速度司令値（自動計算）[m/s]
+    float bucket_arm_height;        // バケツアームの高さ[m]
+    bool bucket_arm_width_extract;  // バケツアームの展開
+    bool bucket_arm_hold;           // バケツアームのハンド保持
+    int8_t move_bucket_angle_yaw;   // ロボット座標系における移動バケツの水平角[-20〜20deg]
+    int8_t bucket1_angle_yaw;       // ロボット座標系におけるバケツ1の水平角[-20〜20deg]
+    int8_t bucket2_angle_yaw;       // ロボット座標系におけるバケツ2の水平角[-20〜20deg]
+    int8_t bucket3_angle_yaw;       // ロボット座標系におけるバケツ3の水平角[-20〜20deg]
+    int8_t flag_angle_yaw;          // ロボット座標系における旗の水平角[-20〜20deg]
+    int8_t desk_angle_yaw;          // ロボット座標系における机の水平角[-20〜20deg]
+} __attribute__((__packed__));
+
+union operation_u {
+    operation_t value;                    // 操作データ
+    uint8_t binary[sizeof(operation_t)];  // 送信バイト配列
+} __attribute__((__packed__));
+
+static_assert(sizeof(operation_t) == 32);
+
+/**
+ * @brief ロボットのセンサ値などのフィードバック
+ *
+ */
+struct feedback_t {
+    uint8_t header;    // ヘッダー
+    uint8_t sequence;  // シーケンス番号
+    // 電源周り
+    bool emergency_stop_enabled;
+    bool over_current;
+    float drive_battery_voltages;
+    float drive_current;
+    // 記録用
+    float belt_launcher_target_velocity;        // 目標速度[m/s]
+    float last_belt_launcher_release_velocity;  // 射出リリース時の初速[m/s]
+    // 各アクチュエータのフィードバック
+    float wheel_angular_velocity[3];  // 0:front 1:left 2:right
+    float belt_launcher_velocity;     // 現在のベルト直動の速度[m/s]
+    float loading_belt_angle;         // 装填機構のプーリー角度[rad]
+    float bucket_arm_height;          // バケツアームの高さ[m]
+} __attribute__((__packed__));
+
+union feedback_u {
+    feedback_t value;
+    uint8_t binary[sizeof(feedback_t)];
+} __attribute__((__packed__));
+
+static_assert(sizeof(feedback_t) == 44);
+
+/**
+ * @brief ロボットの操縦信号値
+ *
+ */
+struct teleop_t {
+    uint8_t header;  // 認識番号
+
+    struct {
+        int8_t stick_right[2];             // 0:x, 1:y
+        int8_t stick_left[2];              // 0:x, 1:y
+    } __attribute__((__packed__)) analog;  // 4byte
+
+    struct {
+        uint8_t stick_push_right : 1;  // 右スティック押し込み
+        uint8_t stick_push_left  : 1;  // 左スティック押し込み
+        uint8_t left_up          : 1;  // 左十字キーの上ボタン
+        uint8_t left_down        : 1;  // 左十字キーの下ボタン
+        uint8_t left_right       : 1;  // 左十字キーの右ボタン
+        uint8_t left_left        : 1;  // 左十字キーの左ボタン
+        uint8_t right_up         : 1;  // 右十字キーの上ボタン
+        uint8_t right_down       : 1;  // 右十字キーの下ボタン
+        uint8_t right_right      : 1;  // 右十字キーの右ボタン
+        uint8_t right_left       : 1;  // 右十字キーの左ボタン
+        uint8_t left_trigger     : 1;  // 左のトリガボタン（旧レバー）
+        uint8_t right_trigger    : 1;  // 右のトリガボタン（旧レバー）
+        uint8_t left_toggle_sw   : 1;  // 左モード指定用トグルスイッチ（上に倒すと:1）
+        uint8_t right_toggle_sw  : 1;  // 左モード指定用トグルスイッチ（上に倒すと:1）
+        uint8_t reserved_1       : 1;
+        uint8_t reserved_2       : 1;
+    } __attribute__((__packed__)) buttons;  // 2byte
+
+    /**
+     * checksum以外を除いた7Byteの和の補数
+     * ただし計算結果の8bitより大きい値は切り捨て
+     */
+    uint8_t data_checksum;
+} __attribute__((__packed__));
+
+union teleop_u {
+    teleop_t value;
+    uint8_t binary[sizeof(teleop_t)];
+} __attribute__((__packed__));
+
+static_assert(sizeof(teleop_t) == 8);
+
+}  // namespace robot_config
