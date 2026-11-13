@@ -1,3 +1,5 @@
+// #define DEBUG_TELEOP
+
 #include "app/app.hpp"
 
 #include <algorithm>
@@ -130,14 +132,14 @@ void update_stick_values()
 
 void update_buttons_value()
 {
-    teleop.buttons.left_up    = HAL_GPIO_ReadPin(BUTTON_L1_GPIO_Port, BUTTON_L1_Pin);
-    teleop.buttons.left_down  = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
-    teleop.buttons.left_right = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
+    teleop.buttons.left_down  = HAL_GPIO_ReadPin(BUTTON_L1_GPIO_Port, BUTTON_L1_Pin);
+    teleop.buttons.left_right = HAL_GPIO_ReadPin(BUTTON_L2_GPIO_Port, BUTTON_L2_Pin);
+    teleop.buttons.left_up    = HAL_GPIO_ReadPin(BUTTON_L3_GPIO_Port, BUTTON_L3_Pin);
     teleop.buttons.left_left  = HAL_GPIO_ReadPin(BUTTON_L4_GPIO_Port, BUTTON_L4_Pin);
 
-    teleop.buttons.right_right = HAL_GPIO_ReadPin(BUTTON_R1_GPIO_Port, BUTTON_R1_Pin);
-    teleop.buttons.right_up    = HAL_GPIO_ReadPin(BUTTON_R2_GPIO_Port, BUTTON_R2_Pin);
-    teleop.buttons.right_down  = HAL_GPIO_ReadPin(BUTTON_R3_GPIO_Port, BUTTON_R3_Pin);
+    teleop.buttons.right_down  = HAL_GPIO_ReadPin(BUTTON_R1_GPIO_Port, BUTTON_R1_Pin);
+    teleop.buttons.right_right = HAL_GPIO_ReadPin(BUTTON_R2_GPIO_Port, BUTTON_R2_Pin);
+    teleop.buttons.right_up    = HAL_GPIO_ReadPin(BUTTON_R3_GPIO_Port, BUTTON_R3_Pin);
     teleop.buttons.right_left  = HAL_GPIO_ReadPin(BUTTON_R4_GPIO_Port, BUTTON_R4_Pin);
 
     teleop.buttons.stick_push_left  = HAL_GPIO_ReadPin(STICK_L_PUSH_GPIO_Port, STICK_L_PUSH_Pin);
@@ -158,20 +160,38 @@ void send_teleop()
     // Ethernetで送信
     ether.send_teleop(teleop);
     // デバッグ表示
-    /*
+#ifdef DEBUG_TELEOP
     printf(
-        "teleop: stick_r=(%d,%d) stick_l=(%d,%d), buttons: right: %d, %d, %d, left: %d, %d, %d,
-    %d\n", teleop.analog.stick_right[0], teleop.analog.stick_right[1], teleop.analog.stick_left[0],
+        "teleop: stick_r=(%d,%d,%d) stick_l=(%d,%d,%d), buttons: right: %d,%d,%d,%d, left: %d, %d, %d,%d, trigger:%d,%d, toggle:%d,%d\n",
+        teleop.analog.stick_right[0],
+        teleop.analog.stick_right[1],
+        teleop.buttons.stick_push_right,
+        teleop.analog.stick_left[0],
         teleop.analog.stick_left[1],
+        teleop.buttons.stick_push_left,
         teleop.buttons.right_up,
         teleop.buttons.right_down,
         teleop.buttons.right_right,
+        teleop.buttons.right_left,
         teleop.buttons.left_up,
         teleop.buttons.left_down,
         teleop.buttons.left_right,
-        teleop.buttons.left_left
+        teleop.buttons.left_left,
+        teleop.buttons.right_trigger,
+        teleop.buttons.left_trigger,
+        teleop.buttons.right_toggle_sw,
+        teleop.buttons.left_toggle_sw
     );
-    */
+#endif
+#ifdef DEBUG_STICK
+    printf(
+        "rx:%d, ry:%d, lx:%d, ly:%d\n",
+        stick_adc_raw_value[0],
+        stick_adc_raw_value[1],
+        stick_adc_raw_value[2],
+        stick_adc_raw_value[3]
+    );
+#endif
     update_teleop_rate_led();
 }
 }  // namespace
