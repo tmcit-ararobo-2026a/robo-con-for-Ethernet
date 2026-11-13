@@ -1,0 +1,42 @@
+@startuml system_architecture
+!theme plain
+skinparam componentStyle uml2
+skinparam shadowing false
+
+node "robo-con-for-Ethernet v2\n(192.168.2.2)" {
+    package "Inputs" {
+        [Analog Sticks x2] as Sticks
+        [D-Pad Buttons (L/R)] as DPad
+        [Triggers (L/R)] as Triggers
+        [Toggle Switches (L/R)] as Toggles
+    }
+
+    package "STM32G474 + W5500" {
+        [ADC2 DMA] as ADC
+        [GPIO] as GPIO
+        [App (100 Hz)] as App
+        [RobotEthernet\n(W5500 SPI2)] as Eth
+    }
+
+    Sticks --> ADC
+    DPad --> GPIO
+    Triggers --> GPIO
+    Toggles --> GPIO
+    ADC --> App
+    GPIO --> App
+    App --> Eth
+}
+
+node "main-board\n(192.168.3.2)" {
+    [ControlArbitrator] as Arbitrator
+}
+
+node "PC (Jetson)" {
+    [ROS 2 Navigation / Launcher] as ROS2
+}
+
+Eth --> Arbitrator : UDP Port 10410\n(teleop_t, 8 bytes, 100 Hz)
+Arbitrator --> ROS2 : UDP Port 26574\n(command_t: mode, TargetId)
+ROS2 --> Arbitrator : UDP Port 39244\n(operation_t)
+
+@enduml

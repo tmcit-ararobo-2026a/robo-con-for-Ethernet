@@ -1,0 +1,35 @@
+@startuml sequence_diagram
+!theme plain
+autonumber
+skinparam shadowing false
+
+participant "TIM6 (100 Hz)" as TIM6
+participant "App (app.cpp)" as App
+participant "ADC2 / GPIO" as IO
+participant "RobotEthernet" as Eth
+participant "W5500 (SPI2)" as W5500
+participant "main-board\n(192.168.3.2:10410)" as Main
+
+== Initialization ==
+App -> IO : Start ADC1/ADC2 DMA
+App -> Eth : init()
+Eth -> W5500 : W5500Init(), set static IP (192.168.2.2), open UDP socket
+App -> TIM6 : Start 100 Hz interrupt
+
+== 100 Hz Control Loop ==
+loop Every 10 ms (TIM6 Interrupt)
+    TIM6 -> App : Set timer_triggered = true
+    App -> IO : Read ADC2 DMA (4 ch) & GPIO pins
+    App -> App : Normalize sticks (deadzone +/-6, -127..127)
+    App -> Eth : send_teleop(teleop_t)
+    Eth -> W5500 : sendto(192.168.3.2, 10410, teleop_t)
+    W5500 -> Main : UDP Packet (8 bytes, header 0xAA)
+    App -> App : Toggle LED3 every 5 packets
+end
+
+== Heartbeat ==
+loop Every 500 ms
+    App -> App : Toggle LED4
+end
+
+@enduml
