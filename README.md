@@ -4,8 +4,9 @@
 
 Wired Ethernet robot controller board and firmware (`STM32G474` + `W5500`) for transmitting `teleop_t` packets over UDP.
 
-<!-- TODO: Add photo of the completed controller assembled with its body -->
-<!-- ![Completed Controller](./docs/controller-completed.png) -->
+<img width="2048" height="1536" alt="robo-con-with-cover" src="https://github.com/user-attachments/assets/43e24efd-8461-484c-b20e-431433ff3342" />
+
+<img width="2048" height="1536" alt="robo-con" src="https://github.com/user-attachments/assets/44635f0f-a78e-48f2-b3fe-f6a4e5720ffd" />
 
 ## Table of Contents
 
