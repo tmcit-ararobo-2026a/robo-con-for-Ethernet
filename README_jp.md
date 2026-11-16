@@ -4,8 +4,10 @@
 
 UDPで `teleop_t` を送信する有線Ethernetコントローラ基板とファームウェア（`STM32G474` + `W5500`）。
 
-<!-- TODO: ボディーと組み合わせた完成版の写真をここに追加 -->
-<!-- ![完成版コントローラ](./docs/controller-completed.png) -->
+<img width="2048" height="1536" alt="robo-con-with-cover" src="https://github.com/user-attachments/assets/43e24efd-8461-484c-b20e-431433ff3342" />
+
+<img width="2048" height="1536" alt="robo-con" src="https://github.com/user-attachments/assets/44635f0f-a78e-48f2-b3fe-f6a4e5720ffd" />
+
 
 ## 目次
 
